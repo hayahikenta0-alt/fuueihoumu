@@ -1132,6 +1132,7 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 8px;
+    max-width: calc(100vw - 32px);
   }
   #calc-toggle {
     display: flex;
@@ -1156,7 +1157,8 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 20px;
-    width: 280px;
+    width: min(280px, calc(100vw - 32px));
+    box-sizing: border-box;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   }
   #calc-panel.open { display: block; }
@@ -1175,6 +1177,7 @@
   }
   #calc-date {
     width: 100%;
+    box-sizing: border-box;
     background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -1198,7 +1201,7 @@
     display: block;
     font-size: 11px;
     color: var(--white-dim);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     letter-spacing: 0.05em;
   }
   .calc-result-badge {
@@ -1208,14 +1211,16 @@
     border: 1px solid var(--border);
     padding: 2px 8px;
     border-radius: 2px;
-    margin-right: 8px;
+    margin-bottom: 8px;
     letter-spacing: 0.1em;
   }
   .calc-result-date {
+    display: block;
     font-family: var(--serif);
     font-size: 16px;
     font-weight: 600;
     color: var(--white);
+    white-space: nowrap;
   }
 </style>
 
