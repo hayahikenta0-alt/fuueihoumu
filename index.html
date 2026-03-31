@@ -1097,8 +1097,175 @@
   <a href="https://line.me/ti/p/ozFqWXaFET#~" class="floating-line-btn" target="_blank" rel="noopener">LINEで無料相談する</a>
 </div>
 
+<!-- 日数計算ウィジェット -->
+<div id="calc-widget">
+  <button id="calc-toggle" aria-label="日数計算">
+    <span id="calc-icon">📅</span>
+    <span id="calc-label">日数計算</span>
+  </button>
+  <div id="calc-panel">
+    <div class="calc-title">申請日数カウンター</div>
+    <div class="calc-note">初日不算入・申請受理日を入力</div>
+    <input type="date" id="calc-date">
+    <div id="calc-results" style="display:none;">
+      <div class="calc-result-row">
+        <span class="calc-result-label">新規届出　営業開始可能日</span>
+        <span class="calc-result-badge">中10日・11日目</span>
+        <span class="calc-result-date" id="result-10"></span>
+      </div>
+      <div class="calc-result-row">
+        <span class="calc-result-label">許可申請　許可予定日</span>
+        <span class="calc-result-badge">中55日・56日目</span>
+        <span class="calc-result-date" id="result-55"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #calc-widget {
+    position: fixed;
+    bottom: 88px;
+    right: 16px;
+    z-index: 98;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  #calc-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--gold);
+    padding: 10px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--sans);
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #calc-toggle:hover { background: rgba(200,169,110,0.1); border-color: var(--gold); }
+  #calc-panel {
+    display: none;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  #calc-panel.open { display: block; }
+  .calc-title {
+    font-family: var(--serif);
+    font-size: 14px;
+    color: var(--gold-light);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .calc-note {
+    font-size: 11px;
+    color: var(--white-dim);
+    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+  }
+  #calc-date {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--white);
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: var(--sans);
+    margin-bottom: 14px;
+    outline: none;
+    cursor: pointer;
+  }
+  #calc-date:focus { border-color: var(--gold); }
+  .calc-result-row {
+    background: rgba(200,169,110,0.06);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .calc-result-label {
+    display: block;
+    font-size: 11px;
+    color: var(--white-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+  .calc-result-badge {
+    display: inline-block;
+    font-size: 10px;
+    color: var(--gold);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-right: 8px;
+    letter-spacing: 0.1em;
+  }
+  .calc-result-date {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+  }
+</style>
+
 <script>
-  const observer = new IntersectionObserver((entries) => {
+  // カレンダーウィジェット
+  const toggle = document.getElementById('calc-toggle');
+  const panel = document.getElementById('calc-panel');
+  const calcDate = document.getElementById('calc-date');
+  const calcResults = document.getElementById('calc-results');
+
+  // 今日の日付をデフォルトに設定
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  calcDate.value = `${yyyy}-${mm}-${dd}`;
+
+  toggle.addEventListener('click', () => {
+    panel.classList.toggle('open');
+  });
+
+  function formatDate(d) {
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    const weeks = ['日','月','火','水','木','金','土'];
+    const w = weeks[d.getDay()];
+    return `${y}年${m}月${day}日（${w}）`;
+  }
+
+  function calcDays(baseDate, days) {
+    // 初日不算入：翌日から起算
+    const result = new Date(baseDate);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+  calcDate.addEventListener('change', () => {
+    const base = new Date(calcDate.value);
+    if (isNaN(base)) return;
+
+    document.getElementById('result-10').textContent = formatDate(calcDays(base, 11));
+    document.getElementById('result-55').textContent = formatDate(calcDays(base, 56));
+    calcResults.style.display = 'block';
+  });
+
+  // 初期表示時にも計算実行
+  calcDate.dispatchEvent(new Event('change'));
+</script>
+
     entries.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
